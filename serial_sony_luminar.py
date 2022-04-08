@@ -2,7 +2,8 @@
 from serial import Serial
 from time import sleep, time
 import signal
-from pysony import SonyAPI, ControlPoint
+import ctypes
+import tisgrabber as tis
 import pandas as pd
 import re
 
