@@ -23,9 +23,19 @@ Tis.Set_Property("Exposure Time (us)",500)
 print("{},{},{},{}".format(Tis.Get_Property("Gain Auto").value,Tis.Get_Property("Gain").value,Tis.Get_Property("Exposure Auto").value,Tis.Get_Property("Exposure Time (us)").value))
 
 if int(rpm) == 47:
-    ShootingSpeed=
     ShootingTime=0.7
 elif int(rpm) == 22:
-    ShootingSpeed="
+    ShootingTime=1
+elif int(rpm) == 15:
+    ShootingTime=2
+elif int(rpm) ==7:
+    ShootingTime=3
 
+def mkfilelist(l_time, l_filename):
+    df_time=pd.Series(l_time, name="time")
+    df_filename=pd.Series(l_filename, name="filename")
+    df_filelist=pd.concat([df_time, df_filename], axis=1)
+    df_filelist.to_csv("{}_{}_{}.csv".format(num_camera, rpm, rep))
 
+def onoff(arg1, arg2):
+    Tis.Set_
