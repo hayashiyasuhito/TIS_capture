@@ -2,11 +2,9 @@
 from serial import Serial
 from time import sleep, time
 import signal
-import pandas as pd
 import re
 import cv2
 import subprocess
-import sys
 import numpy as np
 from datetime import datetime
 import os
@@ -15,7 +13,7 @@ def onoff(arg1,arg2):
     global t
     t = time() - start
     print('time: {}'.format(t))
-    cap = cv2.VideoCapture(2)
+    cap = cv2.VideoCapture('/dev/Video2')
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
     cap.set(cv2.CAP_PROP_FPS, FPS)
@@ -58,18 +56,13 @@ if __name__ == '__main__':
     ser = Serial('/dev/ttyACM0',9600, timeout=None)#linux
     serHigh = bytes("h","utf-8")
     serLow = bytes("l","utf-8")
+    ser.write(serLow)
 
     rpm = input('input rpm:7,15,22,47')
     rep = input('input rep:')
 
     exp_min = input('input experiment time(min): ')
     exp_time = int(exp_min)*60
-
-    ser = Serial('/dev/ttyACM0',9600, timeout=None)#linux
-
-    serHigh = bytes("h","utf-8")
-    serLow = bytes("l","utf-8")
-    ser.write(serLow)
 
     WIDTH = 1920
     HEIGHT = 1200
