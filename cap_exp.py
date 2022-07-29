@@ -13,33 +13,34 @@ def onoff(arg1,arg2):
     global t
     t = time() - start
     print('time: {}'.format(t))
-    cap = cv2.VideoCapture('/dev/Video2')
+    cap = cv2.VideoCapture(2)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
     cap.set(cv2.CAP_PROP_FPS, FPS)
-
     ser.write(serHigh)
-    sleep(0.3)
+    sec_ = datetime.now().strftime("%Y%m%d_%H_%M_%S")
+    date_ = datetime.now().strftime("%Y%m%d")
+    os.makedirs('./{}/{}_{}/{}'.format(date_,rpm,rep,sec_),exist_ok=True)
 
-    min_ = datetime.now().strftime("%Y%m%d_%M")
-    os.makedirs('./{}/{}_{}/{}'.format(date,rpm,rep,min_),exist_ok=True)
-    for i in range(FPS * ShootingTime(rpm)):
+    # はじめの3ファイルは0になってしまうので、これを無視して指定秒数分を取得。
+    for i in range(FPS * int(ShootingTime(rpm)[0])+3):
         ret, frame = cap.read()
-        cv2.imwrite('./{}/{}_{}/{}/{}.jpg'.format(date,rpm,rep,min_,i),frame)
+        if i>2:
+            cv2.imwrite('./{}/{}_{}/{}/{}_{}_{}_{}.jpg'.format(date_,rpm,rep,sec_,rpm,rep,sec_,i-3),frame)
 
     cap.release()
     ser.write(serLow)
 
 def main():
     signal.signal(signal.SIGALRM, onoff)
-    signal.setitimer(signal.ITIMER_REAL,1,60)
+    signal.setitimer(signal.ITIMER_REAL,1,300)
 
     while t < exp_time:
         sleep(1)
 
 def ShootingTime(rpm):
     if int(rpm) == 47:
-        ShootingTime=0.7
+        ShootingTime=1
         FPS = 20
     elif int(rpm) == 22:
         ShootingTime=1
@@ -49,7 +50,7 @@ def ShootingTime(rpm):
         FPS = 10
     elif int(rpm) ==7:
         ShootingTime=3
-        FPS = 10
+        FPS = 5
     return ShootingTime, FPS
 
 if __name__ == '__main__':
@@ -58,15 +59,17 @@ if __name__ == '__main__':
     serLow = bytes("l","utf-8")
     ser.write(serLow)
 
-    rpm = input('input rpm:7,15,22,47')
+    rpm = input('input rpm (7,15,22,47): ')
     rep = input('input rep:')
 
-    exp_min = input('input experiment time(min): ')
+    exp_min = input('input experiment time (min): ')
     exp_time = int(exp_min)*60
 
+    # 4x2.5 cmを写し込む。もとのsonyは、5.2x3.5 cm。
     WIDTH = 1920
     HEIGHT = 1200
-    FPS = 20
+    FPS = ShootingTime(rpm)[1]
+    print(FPS)
 
     #cp = subprocess.run(["v4l2-ctl","--list-devices"] capture_output=True, text=True)
     subprocess.run(["v4l2-ctl","-d","/dev/video2","-p","{}".format(FPS)])
