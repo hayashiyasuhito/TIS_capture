@@ -33,7 +33,7 @@ def onoff(arg1,arg2):
 
 def main():
     signal.signal(signal.SIGALRM, onoff)
-    signal.setitimer(signal.ITIMER_REAL,1,300)
+    signal.setitimer(signal.ITIMER_REAL,1,60)
 
     while t < exp_time:
         sleep(1)
